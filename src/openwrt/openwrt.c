@@ -224,7 +224,6 @@ int installDnsRule(char *targetDomainName, char *srcIpAddr, char *srcMacAddr, ch
 // Removes a DNS entry from the DNS whitelist
 int removeDnsRule(char *targetDomainName, char *srcIpAddr, char *srcMacAddr, char *dnsFileNameWithPath)
 {
-
 	return 0;
 }
 
@@ -233,25 +232,35 @@ int verifyCmsSignature(char *mudFileLocation, char *mudSigFileLocation)
 	/* openssl cms -verify -in mudfile.p7s -inform DER -content badtxt */
 
 	char execBuf[BUFSIZE];
+	char logMessage[BUFSIZE];
 	int retval, sigStatus;
-
-	snprintf(execBuf, BUFSIZE, "openssl cms -verify -in %s -inform DER -content %s -purpose any", mudSigFileLocation, mudFileLocation);
+	
+	snprintf(execBuf, BUFSIZE, "openssl cms -verify -in %s -inform DER -content %s -purpose any &> /var/log/last_mud_signature_verification.txt", mudSigFileLocation, mudFileLocation);
 	execBuf[BUFSIZE-1] = '\0';
-
-	logOmsGeneralMessage(OMS_DEBUG, OMS_SUBSYS_GENERAL, execBuf);
+	logOmsGeneralMessage(OMS_DEBUG, OMS_SUBSYS_GENERAL, execBuf);  // printing the verification command for debug purposes
 	retval = system(execBuf);
-
+	snprintf(logMessage, BUFSIZE, "EXTRA:: Signature verification returns %d", retval);  // printing system return value
+	logOmsGeneralMessage(OMS_DEBUG, OMS_SUBSYS_GENERAL, logMessage);
+	
 	/* A non-zero return value indicates the signature on the mud file was invalid */
-	if (retval) {
+	if (retval != 0) {
 		logOmsGeneralMessage(OMS_ERROR, OMS_SUBSYS_DEVICE_INTERFACE, execBuf);
 		sigStatus = INVALID_MUD_FILE_SIG;
+
+		retval = WEXITSTATUS(retval);  // To extract real error value is necessary to use this macro
+		snprintf(logMessage, BUFSIZE, "EXTRA:: Signature failed: %d", retval);
+		logOmsGeneralMessage(OMS_DEBUG, OMS_SUBSYS_MUD_FILE, logMessage);
+
+		// If the signature failed, I re-execute the command and add the error on a dedicated file
+		snprintf(execBuf, BUFSIZE, "openssl cms -verify -in %s -inform DER -content %s -purpose any >> /var/log/mud_signature_failures.txt 2>&1", mudSigFileLocation, mudFileLocation);
+		execBuf[BUFSIZE-1] = '\0';
+		system(execBuf);
 	}
 	else {
 		sigStatus = VALID_MUD_FILE_SIG;
 	}
 
 	return sigStatus;
-
 }
 
 /*
