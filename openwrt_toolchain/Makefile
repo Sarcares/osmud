@@ -18,7 +18,7 @@ include $(TOPDIR)/rules.mk
 # Name, version and release number
 # The name and version of your package are used to define the variable to point to the build directory of your package: $(PKG_BUILD_DIR)
 PKG_NAME:=osMUD
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.2.6.2
 PKG_RELEASE:=1
 
 # Source settings (i.e. where to find the source codes)
