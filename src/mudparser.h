@@ -21,9 +21,9 @@
  * when scanning the file
  */
 
-#define MAX_DEVICE_POLICIES 50
-#define MAX_ACES 50
-#define MAX_ACLS 10
+#define MAX_DEVICE_POLICIES 150
+#define MAX_ACES 150
+#define MAX_ACLS 100
 #define MAX_DNS_RESOLUTIONS 50
 
 #define IETF_MUD_STATE 1
