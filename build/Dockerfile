@@ -15,7 +15,7 @@
 
 FROM ubuntu:xenial
 
-ENV LEDE_VERSION=v17.01.4
+ENV LEDE_VERSION=v17.01.6
 
 RUN set -ex \
     && apt update \
