@@ -181,7 +181,8 @@ void doProcessLoop(FD filed)
 void printVersion()
 {
 	printf("osmud\n");
-	printf("    Version: %s\n", build_git_sha);
+	printf("    Version: %s\n", build_version);
+	printf("    Last Commit: %s\n", build_git_sha);
 	printf("    Build Date: %s\n", build_git_time);
 }
 
